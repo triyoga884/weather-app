@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenki App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100vh;
+
+            justify-content: center;
+        }
+
+        main {
+            margin: auto;
+            border-radius: 10px;
+            background-color: #c4e4df;
+            padding: 20px 40px;
+            min-width: 400px;
+            width: 35%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        input {
+            padding: 10px;
+            border-radius: 8px;
+            border: none
+        }
+
+        .search-bar {
+            display: flex;
+            width: 100%;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            top: 30%;
+            left: 3%;
+        }
+
+        .search-wrapper input {
+            width: 90%;
+            padding: 10px 5px 10px 35px;
+        }
+
+        input[type=button]:hover {
+            border: white;
+            background-color: #ffc8c5;
+            cursor: pointer;
+        }
+
+        .search-error {
+            color: red;
+            display: none;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 3px solid white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .content img {
+            width: 200px;
+        }
+
+        h3 {
+            font-size: 35px;
+        }
+
+        h4 {
+            font-size: 25px;
+        }
+
+        .temp-detail {
+            font-size: 20px;
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <div class="header">
+            <h1>Weather App</h1>
+        </div>
+        <div class="search-bar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input id="cityName" type="text" placeholder="Search city">
+            </div>
+            <input id="search" type="button" value="Search">
+        </div>
+        <div id="search-error" class="search-error">Masukkan nama kota </div>
+        <div class="content">
+            <h3 id="cityDisplay" class="city">Rhodes Island</h3>
+            <img id="weather-icon" src="/assets/clear.png" alt="weather">
+            <h3 id="temperature" class="temperature">15°C</h3>
+            <h4 id="condition">Cloud</h4>
+            <div class="temp-detail">
+                <span id="humidity">Humidity : 72%</span>
+                <span id="wind">Wind : 8 km/h</span>
+            </div>
+        </div>
+        <p id="tes"></p>
+    </main>
+    <!-- <footer>
+        <a href="https://www.flaticon.com/free-icons/sun" title="sun icons">Sun icons created by Good Ware -
+            Flaticon</a>
+    </footer> -->
+
+
+    <script>
+        const apiKey = 'a58bfcceee1ee3d8d651c27eaa2a63bc';
+        document.getElementById('search').onclick = getInput;
+
+        function getInput() {
+
+            const city = document.getElementById('cityName');
+            if (city.value.trim() !== '') {
+                getWeatherData(city.value);
+                city.value = '';
+                document.getElementById('search-error').style.display = 'none';
+            } else {
+                document.getElementById('search-error').style.display = 'block';
+            }
+        }
+
+        async function getWeatherData(city) {
+
+            try {
+                const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
+                const response = await fetch(url);
+
+                if (!response.ok) throw new Error('Kota tidak ditemukan');
+
+                const data = await response.json();
+
+                const condition = data.weather[0].main;
+
+                document.getElementById('cityDisplay').textContent = data.name;
+                document.getElementById('temperature').textContent = `${data.main.temp} °C`;
+                document.getElementById('condition').textContent = data.weather[0].main;
+                document.getElementById('humidity').textContent = `Humidity : ${data.main.humidity}%`;
+                document.getElementById('wind').textContent = `Wind :  ${data.wind.speed}km/h`;
+
+                const iconImg = document.getElementById('weather-icon')
+                let iconSrc = ''
+
+                switch (condition.toLowerCase()) {
+                    case 'clear':
+                        iconSrc = '/assets/clear.png';
+                        break;
+                    case 'clouds':
+                        iconSrc = '/assets/cloud.png';
+                        break;
+                    case 'drizzle':
+                        iconSrc = '/assets/drizzle.png';
+                        break;
+                    case 'rain':
+                        iconSrc = '/assets/rain.png';
+                        break;
+                    case 'thunderstorm':
+                        iconSrc = '/assets/thunderstorm.png';
+                        break;
+                    case 'snow':
+                        iconSrc = '/assets/snow.png';
+                        break;
+                    case 'mist':
+                    case 'fog':
+                        iconSrc = '/assets/fog.png';
+                        break;
+                }
+                iconImg.src = iconSrc
+                console.info(condition)
+
+            }
+            catch (e) {
+                alert('Gagal mengambil data cuaca. Periksa nama kota atau koneksi anda')
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>
